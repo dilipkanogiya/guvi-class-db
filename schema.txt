@@ -1,0 +1,86 @@
+
+CREATE TABLE Users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('student', 'mentor') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE Classes (
+    class_id INT PRIMARY KEY AUTO_INCREMENT,
+    class_name VARCHAR(255) NOT NULL,
+    mentor_id INT,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (mentor_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Class_Enrollments (
+    enrollment_id INT PRIMARY KEY AUTO_INCREMENT,
+    class_id INT,
+    student_id INT,
+    enrollment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (class_id) REFERENCES Classes(class_id),
+    FOREIGN KEY (student_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Dashboards (
+    dashboard_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT UNIQUE,
+    content TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Tasks (
+    task_id INT PRIMARY KEY AUTO_INCREMENT,
+    class_id INT,
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+    due_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (class_id) REFERENCES Classes(class_id)
+);
+
+CREATE TABLE Webcode (
+    webcode_id INT PRIMARY KEY AUTO_INCREMENT,
+    task_id INT,
+    student_id INT,
+    code_submission TEXT NOT NULL,
+    submission_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (task_id) REFERENCES Tasks(task_id),
+    FOREIGN KEY (student_id) REFERENCES Users(user_id)
+);
+
+CREATE TABLE Queries (
+    query_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    class_id INT,
+    query_text TEXT NOT NULL,
+    response_text TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (class_id) REFERENCES Classes(class_id)
+);
+
+CREATE TABLE Leave_Applications (
+    leave_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    class_id INT,
+    leave_reason TEXT NOT NULL,
+    leave_start_date DATE NOT NULL,
+    leave_end_date DATE NOT NULL,
+    status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id),
+    FOREIGN KEY (class_id) REFERENCES Classes(class_id)
+);
